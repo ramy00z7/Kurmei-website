@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function SupportBanner(){return <section className="support-banner"><div><div className="eyebrow">Help build the archive</div><h2>Support Kurmei</h2><p>Kurmei is designed as a free public research resource. If you want to help fund hosting, research and preservation, you can support the project.</p></div><Link className="btn" href="/support">Support the project →</Link></section>}

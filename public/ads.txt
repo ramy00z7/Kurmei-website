@@ -1,0 +1,2 @@
+# Add the exact Google AdSense publisher line after approval.
+# Example only — do not publish a fabricated publisher ID.

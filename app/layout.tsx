@@ -1,0 +1,3 @@
+import type {Metadata} from "next"; import Script from "next/script"; import "./globals.css";
+export const metadata:Metadata={title:{default:"Kurmei — Sudan, connected.",template:"%s | Kurmei"},description:"An interactive, source-first history of Sudan — connected through time, place, people and sources.",metadataBase:new URL("https://kurmei.com"),robots:{index:true,follow:true}};
+export default function Layout({children}:{children:React.ReactNode}){const client=process.env.NEXT_PUBLIC_ADSENSE_CLIENT; return <html lang="en"><body>{client&&<Script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`} crossOrigin="anonymous" />}{children}</body></html>}
