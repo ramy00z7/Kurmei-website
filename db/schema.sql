@@ -86,3 +86,10 @@ alter table proposals add column if not exists kind text not null default 'event
 alter table proposals alter column date_label drop not null;
 create table if not exists person_citations(id serial primary key, person_id int not null references people(id) on delete cascade, doc_id int not null references documents(id) on delete cascade, page int not null);
 create table if not exists organization_citations(id serial primary key, organization_id int not null references organizations(id) on delete cascade, doc_id int not null references documents(id) on delete cascade, page int not null);
+create table if not exists ethnic_groups(
+  id serial primary key, slug text unique not null, name text not null, other_names text not null default '',
+  region text not null default '', language_family text not null default '', summary text not null default '',
+  sources text not null default '',
+  status text not null default 'published' check (status in ('draft','proposed','review','approved','published','archived')),
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);

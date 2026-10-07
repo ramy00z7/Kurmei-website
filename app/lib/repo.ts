@@ -33,3 +33,12 @@ export async function searchOrganizations(term: string) {
   const like = "%" + term.replace(/[\\%_]/g, m => "\\" + m) + "%";
   return (await (await db()).query(`select ${OCOLS} from organizations where status='published' and (name ilike $1 or kind ilike $1 or summary ilike $1) order by name limit 50`, [like])).rows;
 }
+
+const GCOLS = "slug,name,other_names,region,language_family,summary,sources";
+export async function publishedEthnicGroups() {
+  return (await (await db()).query(`select ${GCOLS} from ethnic_groups where status='published' order by name`)).rows;
+}
+export async function searchEthnicGroups(term: string) {
+  const like = "%" + term.replace(/[\\%_]/g, m => "\\" + m) + "%";
+  return (await (await db()).query(`select ${GCOLS} from ethnic_groups where status='published' and (name ilike $1 or other_names ilike $1 or region ilike $1 or summary ilike $1) order by name limit 50`, [like])).rows;
+}

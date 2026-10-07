@@ -25,8 +25,12 @@ async function init(): Promise<Q> {
 async function seed(q: Q) {
   if ((await q.query("select count(*)::int n from events")).rows[0].n > 0) return;
   const { events, relations, places } = await import("@/app/data");
+  const { ethnicGroupSeed } = await import("@/app/lib/ethnic-groups-seed");
   for (const p of places)
     await q.query("insert into places(slug,name,summary,period,lat,lng,status) values($1,$2,$3,$4,$5,$6,'published')", [p.slug, p.name, "", p.period, p.lat, p.lng]);
+  for (const g of ethnicGroupSeed)
+    await q.query("insert into ethnic_groups(slug,name,other_names,region,language_family,summary,sources,status) values($1,$2,$3,$4,$5,$6,$7,'published')",
+      [g.slug, g.name, g.other, g.region, g.lang, g.summary, g.sources]);
   const ids: Record<string, number> = {};
   for (const e of events) {
     const r = await q.query(
