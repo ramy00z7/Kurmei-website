@@ -22,22 +22,34 @@ async function init(): Promise<Q> {
   await seed(q);
   return q;
 }
+/** Each table seeds independently on its own "is it empty" check — NOT gated by whether
+ *  other tables already have rows. A table added in a later release must still seed itself
+ *  on a database that was already bootstrapped by an earlier release. */
+async function isEmpty(q: Q, table: string) {
+  return (await q.query(`select count(*)::int n from ${table}`)).rows[0].n === 0;
+}
 async function seed(q: Q) {
-  if ((await q.query("select count(*)::int n from events")).rows[0].n > 0) return;
-  const { events, relations, places } = await import("@/app/data");
-  const { ethnicGroupSeed } = await import("@/app/lib/ethnic-groups-seed");
-  for (const p of places)
-    await q.query("insert into places(slug,name,summary,period,lat,lng,status) values($1,$2,$3,$4,$5,$6,'published')", [p.slug, p.name, "", p.period, p.lat, p.lng]);
-  for (const g of ethnicGroupSeed)
-    await q.query("insert into ethnic_groups(slug,name,other_names,region,language_family,summary,sources,status) values($1,$2,$3,$4,$5,$6,$7,'published')",
-      [g.slug, g.name, g.other, g.region, g.lang, g.summary, g.sources]);
-  const ids: Record<string, number> = {};
-  for (const e of events) {
-    const r = await q.query(
-      "insert into events(slug,title,summary,date_label,date_precision,place,lat,lng,status,sort_year) values($1,$2,$3,$4,$5,$6,$7,$8,'published',$9) returning id",
-      [e.slug, e.title, e.summary, e.year, e.year.startsWith("c.") ? "approximate" : "year", e.place, e.lat, e.lng, deriveYear(e.year)]);
-    ids[e.slug] = r.rows[0].id;
+  if (await isEmpty(q, "places")) {
+    const { places } = await import("@/app/data");
+    for (const p of places)
+      await q.query("insert into places(slug,name,summary,period,lat,lng,status) values($1,$2,$3,$4,$5,$6,'published')", [p.slug, p.name, "", p.period, p.lat, p.lng]);
   }
-  for (const r of relations)
-    await q.query("insert into event_relations(from_id,to_id,type,confidence,note) values($1,$2,$3,$4,$5)", [ids[r.from], ids[r.to], r.type, r.confidence, r.note]);
+  if (await isEmpty(q, "ethnic_groups")) {
+    const { ethnicGroupSeed } = await import("@/app/lib/ethnic-groups-seed");
+    for (const eg of ethnicGroupSeed)
+      await q.query("insert into ethnic_groups(slug,name,other_names,region,language_family,summary,sources,status) values($1,$2,$3,$4,$5,$6,$7,'published')",
+        [eg.slug, eg.name, eg.other, eg.region, eg.lang, eg.summary, eg.sources]);
+  }
+  if (await isEmpty(q, "events")) {
+    const { events, relations } = await import("@/app/data");
+    const ids: Record<string, number> = {};
+    for (const e of events) {
+      const r = await q.query(
+        "insert into events(slug,title,summary,date_label,date_precision,place,lat,lng,status,sort_year) values($1,$2,$3,$4,$5,$6,$7,$8,'published',$9) returning id",
+        [e.slug, e.title, e.summary, e.year, e.year.startsWith("c.") ? "approximate" : "year", e.place, e.lat, e.lng, deriveYear(e.year)]);
+      ids[e.slug] = r.rows[0].id;
+    }
+    for (const r of relations)
+      await q.query("insert into event_relations(from_id,to_id,type,confidence,note) values($1,$2,$3,$4,$5)", [ids[r.from], ids[r.to], r.type, r.confidence, r.note]);
+  }
 }
