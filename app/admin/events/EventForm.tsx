@@ -7,6 +7,8 @@ export default function EventForm({ e }: { e?: any }) {
     <label>Title<input name="title" required defaultValue={e?.title} /></label>
     <label>Slug (URL)<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" defaultValue={e?.slug} /></label>
     <label>Summary<textarea name="summary" rows={4} defaultValue={e?.summary} /></label>
+    <label>العنوان بالعربية (Arabic title — optional)<input name="title_ar" dir="rtl" defaultValue={e?.title_ar ?? ""} /></label>
+    <label>الملخص بالعربية (Arabic summary — optional)<textarea name="summary_ar" dir="rtl" rows={4} defaultValue={e?.summary_ar ?? ""} /></label>
     <label>Date as written (e.g. c. 750 BCE, 1956)<input name="date_label" required defaultValue={e?.date_label} /></label>
     <label>Sort year (optional; negative for BCE, e.g. -750. Used to order the timeline)<input name="sort_year" type="number" defaultValue={e?.sort_year ?? ""} /></label>
     <label>Date precision{sel("date_precision", PRECISIONS, e?.date_precision ?? "year")}</label>

@@ -15,14 +15,14 @@ function parse(f: FormData) {
   if (!s("name")) throw new Error("Name is required");
   const lat = n("lat"), lng = n("lng");
   if ((lat !== null && !(Math.abs(lat) <= 90)) || (lng !== null && !(Math.abs(lng) <= 180))) throw new Error("Invalid coordinates");
-  return [s("slug"), s("name"), s("summary"), s("period"), lat, lng, pick("location_precision", LOC_PRECISIONS), pick("status", STATUSES)];
+  return [s("slug"), s("name"), s("summary"), s("period"), lat, lng, pick("location_precision", LOC_PRECISIONS), pick("status", STATUSES), s("name_ar") || null, s("period_ar") || null];
 }
 export async function savePlaces(f: FormData) {
   await guard(); const v = parse(f); const id = Number(f.get("id") || 0); const q = await db();
-  const cols = "slug,name,summary,period,lat,lng,location_precision,status";
+  const cols = "slug,name,summary,period,lat,lng,location_precision,status,name_ar,period_ar";
   let eid = id;
-  if (id) await q.query(`update places set (${cols}, updated_at)=($1,$2,$3,$4,$5,$6,$7,$8, now()) where id=$${v.length + 1}`, [...v, id]);
-  else eid = (await q.query(`insert into places(${cols}) values($1,$2,$3,$4,$5,$6,$7,$8) returning id`, v)).rows[0].id;
+  if (id) await q.query(`update places set (${cols}, updated_at)=($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now()) where id=$${v.length + 1}`, [...v, id]);
+  else eid = (await q.query(`insert into places(${cols}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning id`, v)).rows[0].id;
   await q.query("insert into audit_log(action,entity,entity_id,detail) values($1,'places',$2,$3)", [id ? "update" : "create", eid, JSON.stringify({ slug: v[0] })]);
   revalidatePath("/admin/places"); redirect("/admin/places");
 }

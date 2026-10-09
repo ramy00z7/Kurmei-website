@@ -133,3 +133,12 @@ h3{font-size:25px;margin:8px 0 12px}
 @media(max-width:850px){.links{display:none}.grid,.admin-grid,.split,.hero,.footer-grid{grid-template-columns:1fr}.hero{padding-top:55px}h1{font-size:64px}.support-banner{align-items:flex-start;flex-direction:column}}
 .form label{display:block;margin:14px 0 4px}
 .form input,.form select,.form textarea{display:block;width:100%;margin-top:4px;padding:12px;background:#0f0f0f;color:inherit;border:1px solid #444;border-radius:8px;font:inherit}
+[dir="rtl"]{direction:rtl}
+[dir="rtl"] .timeline{border-left:none;border-right:2px solid var(--pill-border);margin:35px 15px 0 0;padding-left:0;padding-right:30px}
+[dir="rtl"] .event:before{left:auto;right:-39px}
+[dir="rtl"] .crumb{direction:rtl}
+[dir="rtl"] body,[dir="rtl"]{font-family:"Noto Naskh Arabic","Noto Sans Arabic",Tahoma,Georgia,serif}
+.lang-switch{margin-left:16px;color:var(--links-color);text-decoration:none;font:600 13px Arial,sans-serif;border:1px solid var(--nav-border);border-radius:999px;padding:6px 12px}
+[dir="rtl"] .lang-switch{margin-left:0;margin-right:16px}
+[dir="rtl"] .links a{margin-left:0;margin-right:22px}
+[dir="rtl"] .theme-toggle{margin-left:0;margin-right:22px}

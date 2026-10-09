@@ -15,14 +15,14 @@ function parse(f: FormData) {
   if (!s("title") || !s("date_label")) throw new Error("Title and date are required");
   const lat = n("lat"), lng = n("lng");
   if ((lat !== null && !(Math.abs(lat) <= 90)) || (lng !== null && !(Math.abs(lng) <= 180))) throw new Error("Invalid coordinates");
-  return [s("slug"), s("title"), s("summary"), s("date_label"), pick("date_precision", PRECISIONS), s("place"), lat, lng, pick("location_precision", LOC_PRECISIONS), pick("status", STATUSES), n("sort_year") ?? deriveYear(s("date_label"))];
+  return [s("slug"), s("title"), s("summary"), s("date_label"), pick("date_precision", PRECISIONS), s("place"), lat, lng, pick("location_precision", LOC_PRECISIONS), pick("status", STATUSES), n("sort_year") ?? deriveYear(s("date_label")), s("title_ar") || null, s("summary_ar") || null];
 }
 export async function saveEvent(f: FormData) {
   await guard(); const v = parse(f); const id = Number(f.get("id") || 0); const q = await db();
-  const cols = "slug,title,summary,date_label,date_precision,place,lat,lng,location_precision,status,sort_year";
+  const cols = "slug,title,summary,date_label,date_precision,place,lat,lng,location_precision,status,sort_year,title_ar,summary_ar";
   let eid = id;
-  if (id) await q.query(`update events set (${cols}, updated_at)=($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, now()) where id=$12`, [...v, id]);
-  else eid = (await q.query(`insert into events(${cols}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning id`, v)).rows[0].id;
+  if (id) await q.query(`update events set (${cols}, updated_at)=($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now()) where id=$14`, [...v, id]);
+  else eid = (await q.query(`insert into events(${cols}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) returning id`, v)).rows[0].id;
   await q.query("insert into audit_log(action,entity,entity_id,detail) values($1,'event',$2,$3)", [id ? "update" : "create", eid, JSON.stringify({ slug: v[0], status: v[9] })]);
   revalidatePath("/admin/events"); redirect("/admin/events");
 }

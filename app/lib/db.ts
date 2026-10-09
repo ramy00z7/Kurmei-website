@@ -29,24 +29,31 @@ async function isEmpty(q: Q, table: string) {
   return (await q.query(`select count(*)::int n from ${table}`)).rows[0].n === 0;
 }
 async function seed(q: Q) {
+  const { eventAr, placeAr, tribeAr } = await import("@/app/lib/ar-seed");
   if (await isEmpty(q, "places")) {
     const { places } = await import("@/app/data");
-    for (const p of places)
-      await q.query("insert into places(slug,name,summary,period,lat,lng,status) values($1,$2,$3,$4,$5,$6,'published')", [p.slug, p.name, "", p.period, p.lat, p.lng]);
+    for (const p of places) {
+      const ar = placeAr[p.slug];
+      await q.query("insert into places(slug,name,summary,period,lat,lng,status,name_ar,period_ar) values($1,$2,$3,$4,$5,$6,'published',$7,$8)",
+        [p.slug, p.name, "", p.period, p.lat, p.lng, ar?.name ?? null, ar?.period ?? null]);
+    }
   }
   if (await isEmpty(q, "ethnic_groups")) {
     const { ethnicGroupSeed } = await import("@/app/lib/ethnic-groups-seed");
-    for (const eg of ethnicGroupSeed)
-      await q.query("insert into ethnic_groups(slug,name,other_names,region,language_family,summary,sources,status) values($1,$2,$3,$4,$5,$6,$7,'published')",
-        [eg.slug, eg.name, eg.other, eg.region, eg.lang, eg.summary, eg.sources]);
+    for (const eg of ethnicGroupSeed) {
+      const ar = tribeAr[eg.slug];
+      await q.query("insert into ethnic_groups(slug,name,other_names,region,language_family,summary,sources,status,name_ar,region_ar,summary_ar) values($1,$2,$3,$4,$5,$6,$7,'published',$8,$9,$10)",
+        [eg.slug, eg.name, eg.other, eg.region, eg.lang, eg.summary, eg.sources, ar?.name ?? null, ar?.region ?? null, ar?.summary ?? null]);
+    }
   }
   if (await isEmpty(q, "events")) {
     const { events, relations } = await import("@/app/data");
     const ids: Record<string, number> = {};
     for (const e of events) {
+      const ar = eventAr[e.slug];
       const r = await q.query(
-        "insert into events(slug,title,summary,date_label,date_precision,place,lat,lng,status,sort_year) values($1,$2,$3,$4,$5,$6,$7,$8,'published',$9) returning id",
-        [e.slug, e.title, e.summary, e.year, e.year.startsWith("c.") ? "approximate" : "year", e.place, e.lat, e.lng, deriveYear(e.year)]);
+        "insert into events(slug,title,summary,date_label,date_precision,place,lat,lng,status,sort_year,title_ar,summary_ar) values($1,$2,$3,$4,$5,$6,$7,$8,'published',$9,$10,$11) returning id",
+        [e.slug, e.title, e.summary, e.year, e.year.startsWith("c.") ? "approximate" : "year", e.place, e.lat, e.lng, deriveYear(e.year), ar?.title ?? null, ar?.summary ?? null]);
       ids[e.slug] = r.rows[0].id;
     }
     for (const r of relations)

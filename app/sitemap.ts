@@ -4,13 +4,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connection(); // render per request so newly published events appear
   const base = "https://kurmei.com";
   const pages = ["", "/timeline", "/map", "/explore", "/search", "/about", "/methodology", "/sources", "/support", "/contact", "/privacy", "/terms"];
+  const arPages = ["/ar", "/ar/timeline", "/ar/tribes", "/ar/about"];
   const [ev, pl, pe, og, tr] = await Promise.all([publishedEvents(), publishedPlaces(), publishedPeople(), publishedOrganizations(), publishedEthnicGroups()]);
   return [
     ...pages.map(p => ({ url: base + p })),
+    ...arPages.map(p => ({ url: base + p })),
     ...ev.map(e => ({ url: `${base}/events/${e.slug}` })),
     ...pl.map(p => ({ url: `${base}/places/${p.slug}` })),
     ...pe.map(p => ({ url: `${base}/people/${p.slug}` })),
     ...og.map(o => ({ url: `${base}/organizations/${o.slug}` })),
     ...tr.map((t: any) => ({ url: `${base}/tribes/${t.slug}` })),
+    ...ev.map(e => ({ url: `${base}/ar/events/${e.slug}` })),
+    ...pl.map(p => ({ url: `${base}/ar/places/${p.slug}` })),
+    ...tr.map((t: any) => ({ url: `${base}/ar/tribes/${t.slug}` })),
   ];
 }

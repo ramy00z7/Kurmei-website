@@ -7,6 +7,8 @@ export default function PlaceForm({ p }: { p?: any }) {
     <label>Name<input name="name" required defaultValue={p?.name} /></label>
     <label>Slug (URL)<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" defaultValue={p?.slug} /></label>
     <label>Summary<textarea name="summary" rows={4} defaultValue={p?.summary} /></label>
+    <label>الاسم بالعربية (Arabic name — optional)<input name="name_ar" dir="rtl" defaultValue={p?.name_ar ?? ""} /></label>
+    <label>الفترة بالعربية (Arabic period — optional)<input name="period_ar" dir="rtl" defaultValue={p?.period_ar ?? ""} /></label>
     <label>Period (e.g. Kush, Modern Sudan)<input name="period" defaultValue={p?.period} /></label>
     <label>Latitude<input name="lat" type="number" step="any" min={-90} max={90} defaultValue={p?.lat ?? ""} /></label>
     <label>Longitude<input name="lng" type="number" step="any" min={-180} max={180} defaultValue={p?.lng ?? ""} /></label>

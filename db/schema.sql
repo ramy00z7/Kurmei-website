@@ -93,3 +93,10 @@ create table if not exists ethnic_groups(
   status text not null default 'published' check (status in ('draft','proposed','review','approved','published','archived')),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+alter table events add column if not exists title_ar text;
+alter table events add column if not exists summary_ar text;
+alter table places add column if not exists name_ar text;
+alter table places add column if not exists period_ar text;
+alter table ethnic_groups add column if not exists name_ar text;
+alter table ethnic_groups add column if not exists region_ar text;
+alter table ethnic_groups add column if not exists summary_ar text;
